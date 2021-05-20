@@ -1,0 +1,13 @@
+version: "2.2"
+
+volumes:
+  paconfig:
+    external: true
+    name: paconfig
+  u1804dev:
+    external: true
+    name: u1804dev
+
+networks:
+  access:
+    driver: bridge

@@ -1,0 +1,25 @@
+version: "2.2"
+services:
+  Ubuntu-18.04:
+#    image: ubuntu:18.04
+    image: jcbiz/u1804dev:2021051901
+    container_name: u1804dev
+    privileged: false
+    restart: unless-stopped
+    mem_limit: 2048m
+    cpus: 2.0
+#    entrypoint: /bin/bash -c "while true; do sleep 14400; done"
+    env_file:
+      - "lilee.env"
+      - "u1804dev.env"
+    volumes:
+      - "/tmp/.X11-unix:/tmp/.X11-unix"
+      - "/tmp/.pulse:/tmp/.pulse"
+      - "paconfig:/etc/pulse"
+      - "/var/lib/pulse:/var/lib/pulse"
+      - "/run/user/0/pulse:/run/user/0/pulse"
+      - "u1804dev:/home"
+    networks:
+      access:
+    ports:
+      - "18422:22/tcp"
