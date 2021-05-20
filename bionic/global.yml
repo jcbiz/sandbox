@@ -1,0 +1,13 @@
+version: "2.2"
+
+volumes:
+  paconfig:
+    external: true
+    name: paconfig
+  bionic:
+    external: true
+    name: bionic
+
+networks:
+  access:
+    driver: bridge
