@@ -19,6 +19,7 @@ services:
       - "/var/lib/pulse:/var/lib/pulse"
       - "/run/user/0/pulse:/run/user/0/pulse"
       - "u1804dev:/home"
+      - "/var/run/docker.sock:/var/run/docker.sock"
     networks:
       access:
     ports:
