@@ -272,7 +272,7 @@ def readAndParseData18xx(Dataport, configParameters):
 
             # Read the data depending on the TLV message
             if tlv_type == MMWDEMO_OUTPUT_MSG_DETECTED_POINTS:
-                print(f'tlv_type: List of detected points / len: {tlv_length}')
+                #print(f'tlv_type: List of detected points / len: {tlv_length}')
 
                 # Initialize the arrays
                 x = np.zeros(numDetectedObj,dtype=np.float32)
@@ -307,13 +307,13 @@ def readAndParseData18xx(Dataport, configParameters):
                     dataList.append(detObj)
  
             elif tlv_type == MMWDEMO_OUTPUT_MSG_RANGE_PROFILE:
-                print(f'tlv_type: Range profile / len: {tlv_length}')
+                #print(f'tlv_type: Range profile / len: {tlv_length}')
 
                 # Get the number of bytes to read - Length: (Range FFT size) x (size of uint16_t)
                 payload = byteBuffer[idX:idX + tlv_length]
                 idX += tlv_length
                 numBytes = configParameters["numRangeBins"] * 2
-                print(f'  numBytes: {numBytes}')
+                #print(f'  numBytes: {numBytes}')
                 rangeFFT = payload.copy(order='C')
                 if numBytes > tlv_length:
                     rangeFFT = np.pad(rangeFFT, (0, numBytes - tlv_length), 'constant', constant_values=(0))
@@ -325,13 +325,13 @@ def readAndParseData18xx(Dataport, configParameters):
                 dataList.append(mapRangeFFT)
 
             elif tlv_type == MMWDEMO_OUTPUT_MSG_NOISE_PROFILE:
-                print(f'tlv_type: Noise floor profile / len: {tlv_length}')
+                #print(f'tlv_type: Noise floor profile / len: {tlv_length}')
 
                 # Get the number of bytes to read - Length: (Range FFT size) x (size of uint16_t)
                 payload = byteBuffer[idX:idX + tlv_length]
                 idX += tlv_length
                 numBytes = configParameters["numRangeBins"] * 2
-                print(f'  numBytes: {numBytes}')
+                #print(f'  numBytes: {numBytes}')
                 noiseFFT = payload.copy(order='C')
                 if numBytes > tlv_length:
                     noiseFFT = np.pad(noiseFFT, (0, numBytes - tlv_length), 'constant', constant_values=(0))
@@ -348,7 +348,7 @@ def readAndParseData18xx(Dataport, configParameters):
                     ...
                 Imag(ant 0, range R-1), Real(ant 0, range R-1),...,Imag(ant N-1, range R-1),Real(ant N-1, range R-1)
                 '''
-                print(f'tlv_type: Samples to calculate static azimuth heatmap / len: {tlv_length}')
+                #print(f'tlv_type: Samples to calculate static azimuth heatmap / len: {tlv_length}')
                 
                 # Get the number of bytes to read - Length: (Range FFT size) x (Number of virtual antennas) (size of cmplx16ImRe_t_) - 2 int16
                 payload = byteBuffer[idX:idX + tlv_length]
@@ -373,7 +373,7 @@ def readAndParseData18xx(Dataport, configParameters):
                     ...
                 X(range bin R-1, Doppler bin 0),...,X(range bin R-1, Doppler bin D-1)
                 '''
-                print(f'tlv_type: Range/Doppler detection matrix / len: {tlv_length}')
+                #print(f'tlv_type: Range/Doppler detection matrix / len: {tlv_length}')
 
                 # Get the number of bytes to read - Length: (Range FFT size) x (Doppler FFT size) (size of uint16_t)
                 numBytes = 2 * configParameters["numRangeBins"] * configParameters["numDopplerBins"]
@@ -408,7 +408,7 @@ def readAndParseData18xx(Dataport, configParameters):
                 uint32_t 	interFrameCPULoad
  	                CPU Load (%) during inter frame duration.
                 '''
-                print(f'tlv_type: Stats information / len: {tlv_length}')
+                #print(f'tlv_type: Stats information / len: {tlv_length}')
                 endPos = idX + tlv_length
 
                 # Copy out the raw data
@@ -436,7 +436,7 @@ def readAndParseData18xx(Dataport, configParameters):
                     dataList.append(mapStats)
 
             elif tlv_type == MMWDEMO_OUTPUT_MSG_DETECTED_POINTS_SIDE_INFO:
-                print(f'tlv_type: List of detected points side info / len: {tlv_length}')
+                #print(f'tlv_type: List of detected points side info / len: {tlv_length}')
 
                 # Initialize the arrays
                 snr = np.zeros(numDetectedObj,dtype=np.int16)
@@ -461,7 +461,7 @@ def readAndParseData18xx(Dataport, configParameters):
                     dataList.append(detObj)
 
             elif tlv_type == MMWDEMO_OUTPUT_MSG_AZIMUT_ELEVATION_STATIC_HEAT_MAP:
-                print(f'tlv_type: Samples to calculate static azimuth/elevation heatmap / len: {tlv_length}')
+                #print(f'tlv_type: Samples to calculate static azimuth/elevation heatmap / len: {tlv_length}')
                 idX += tlv_length
 
             elif tlv_type == MMWDEMO_OUTPUT_MSG_TEMPERATURE_STATS:
@@ -482,7 +482,7 @@ def readAndParseData18xx(Dataport, configParameters):
                         rlInt16_t tmpDig0Sens - Digital temp sensor reading (signed value). 1 LSB = 1 deg C
                         rlInt16_t tmpDig1Sens - Second digital temp sensor reading (signed value).( applicable only in xWR1642/xWR6843/xWR1843.); 1 LSB = 1 deg C
                 '''
-                print(f'tlv_type: temperature stats from Radar front end / len: {tlv_length}')
+                #print(f'tlv_type: temperature stats from Radar front end / len: {tlv_length}')
                 endPos = idX + tlv_length
                 # Copy out the raw data
                 if idX + 4 <= endPos:
@@ -552,19 +552,33 @@ def readAndParseData18xx(Dataport, configParameters):
 
 def plotDetectedPointsGraph(data):
     if not hasattr(plotDetectedPointsGraph,"sp"):
-        plotDetectedPointsGraph.sp = None
+        plotDetectedPointsGraph.sp = [None, None, None] # keep 3 copies
+        plotDetectedPointsGraph.spIndex = 0;
 
     global widgetDetectedPoints
     if widgetDetectedPoints == None:
         widgetDetectedPoints = gl.GLViewWidget()
-        widgetDetectedPoints.opts['distance'] = 20
-        widgetDetectedPoints.setGeometry(100, 100, 1024, 768)
+        widgetDetectedPoints.opts['distance'] = 20 # distance of camera from center
+        widgetDetectedPoints.opts['fov'] = 60  # horizontal field of view in degrees
+        widgetDetectedPoints.opts['azimuth'] = -75 # camera's azimuthal angle in degrees, 仰俯角
+        widgetDetectedPoints.opts['elevation'] = 30 # camera's angle of elevation in degrees, 方位角
+        widgetDetectedPoints.setGeometry(100, 100, 800, 800)
         widgetDetectedPoints.show()
         widgetDetectedPoints.setWindowTitle('Detected Points')
-        grid = gl.GLGridItem()
-        #grid.rotate(90, 0, 1, 0)
-        #grid.translate(-10, 0, 0)
-        widgetDetectedPoints.addItem(grid)
+        gridX = gl.GLGridItem()
+        gridX.rotate(0, 0, 1, 0)
+        gridX.translate(0, 0, 0)
+        widgetDetectedPoints.addItem(gridX)
+        # center dot
+        pos = np.array([0.0, 0.0, 0.0])
+        size = np.array([0.2])
+        color = np.array([1.0, 0.0, 0.0, 0.5])
+        center  = gl.GLScatterPlotItem(pos=pos, size=size, color=color, pxMode=False)
+        widgetDetectedPoints.addItem(center)
+        # axis
+        axis = gl.GLAxisItem(antialias=True, glOptions='translucent')
+        axis.setSize(x=10, y=10, z=10)
+        widgetDetectedPoints.addItem(axis)
 
     if data["type"] == MMWDEMO_OUTPUT_MSG_DETECTED_POINTS and len(data["x"]) > 0:
         x = data["x"]
@@ -579,20 +593,26 @@ def plotDetectedPointsGraph(data):
         color = np.empty((len(data["x"]), 4))
         for i in range(len(x)):
             pos[i] = (x[i], y[i], z[i])
-            color[i] = (1.0, 0.0, 0.0, v[i])
+            #print(pos)
+            color[i] = (0.0, 1.0, 0.0, v[i]) #color (r,g,b,a)
             size[i] = s[i] / 1000
 
         sp1 = gl.GLScatterPlotItem(pos=pos, size=size, color=color, pxMode=False)
-        sp1.translate(5,5,0)
-        if plotDetectedPointsGraph.sp != None:
-            widgetDetectedPoints.removeItem(plotDetectedPointsGraph.sp)
-        plotDetectedPointsGraph.sp = sp1
-        widgetDetectedPoints.addItem(plotDetectedPointsGraph.sp)
+        sp1.translate(0, 0, 0)
+
+        if plotDetectedPointsGraph.sp[plotDetectedPointsGraph.spIndex] != None:
+            sp2 = plotDetectedPointsGraph.sp[plotDetectedPointsGraph.spIndex]
+            widgetDetectedPoints.removeItem(sp2)
+
+        plotDetectedPointsGraph.sp[plotDetectedPointsGraph.spIndex] = sp1
+        widgetDetectedPoints.addItem(sp1)
+        plotDetectedPointsGraph.spIndex = (plotDetectedPointsGraph.spIndex + 1) % len(plotDetectedPointsGraph.sp)
 
 
 # Function to dump numpy matrix
 def printData(data):
-    print(data)
+    #print(data)
+    return None
 
 # Function to dump objects into CSV
 def printDetectedPointsCSV(data):
