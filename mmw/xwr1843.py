@@ -593,9 +593,11 @@ def plotDetectedPointsGraph(data):
         color = np.empty((len(data["x"]), 4))
         for i in range(len(x)):
             pos[i] = (x[i], y[i], z[i])
-            #print(pos)
-            color[i] = (0.0, 1.0, 0.0, v[i]) #color (r,g,b,a)
             size[i] = s[i] / 1000
+            if v[i]>= 0:
+                color[i] = (0.0, v[i], 0.0, 1.0) #color (r,g,b,a)
+            else:
+                color[i] = (-v[i], 0.0, 0.0, 1.0) #color (r,g,b,a)
 
         sp1 = gl.GLScatterPlotItem(pos=pos, size=size, color=color, pxMode=False)
         sp1.translate(0, 0, 0)
