@@ -14,7 +14,8 @@ except ImportError as e:
 # Change the configuration file name
 #configFileName = 'AWR1843config.cfg'
 #configFileName = 'ss.cfg'
-configFileName = 'profile_3d.cfg'
+#configFileName = 'profile_3d.cfg'
+configFileName = 'profile_3d.1.cfg'
 
 BYTE_VEC_ACC_MAX_SIZE = 2**15
 
@@ -54,7 +55,6 @@ widgetDetectedPoints = None
 # Function to configure the serial ports and send the data from
 # the configuration file to the radar
 def serialConfig(configFileName):
-    
     global CLIport
     global Dataport
     # Open the serial ports for the configuration and the data ports
@@ -74,9 +74,13 @@ def serialConfig(configFileName):
 
     # Read the configuration file and send it to the board
     config = [line.rstrip('\r\n') for line in open(configFileName)]
-    for i in config:
-        CLIport.write((i+'\n').encode())
-        print(i)
+    for line in config:
+        # skip empty lines and comments
+        sline = line.strip()
+        if len(sline) == 0 or sline.startswith('%'):  continue
+        # write the command
+        CLIport.write((line+'\n').encode())
+        print(line)
         time.sleep(0.02)
         
     return CLIport, Dataport
@@ -146,33 +150,6 @@ def parseConfigFile(configFileName):
     return configParameters
    
 # ------------------------------------------------------------------
-'''
-def parseDetectedObjects(byteBuffer, idX, numDetectedObj):
-    if numDetectedObj <= 0:
-        return None
-
-    # Initialize the arrays
-    x = np.zeros(numDetectedObj,dtype=np.float32)
-    y = np.zeros(numDetectedObj,dtype=np.float32)
-    z = np.zeros(numDetectedObj,dtype=np.float32)
-    velocity = np.zeros(numDetectedObj,dtype=np.float32)
-                
-    for objectNum in range(numDetectedObj):
-        # Read the data for each object
-        x[objectNum] = byteBuffer[idX:idX + 4].view(dtype=np.float32)
-        idX += 4
-        y[objectNum] = byteBuffer[idX:idX + 4].view(dtype=np.float32)
-        idX += 4
-        z[objectNum] = byteBuffer[idX:idX + 4].view(dtype=np.float32)
-        idX += 4
-        velocity[objectNum] = byteBuffer[idX:idX + 4].view(dtype=np.float32)
-        idX += 4
-        
-    # Store the data in the detObj dictionary
-    detObj = {"numObj": numDetectedObj, "x": x, "y": y, "z": z, "velocity":velocity}
-
-    return detObj
-'''
 
 # Funtion to read and parse the incoming data
 def readAndParseData18xx(Dataport, configParameters):
@@ -552,7 +529,7 @@ def readAndParseData18xx(Dataport, configParameters):
 
 def plotDetectedPointsGraph(data):
     if not hasattr(plotDetectedPointsGraph,"sp"):
-        plotDetectedPointsGraph.sp = [None, None, None] # keep 3 copies
+        plotDetectedPointsGraph.sp = [None, None] # keep 2 copies
         plotDetectedPointsGraph.spIndex = 0;
 
     global widgetDetectedPoints
@@ -593,14 +570,14 @@ def plotDetectedPointsGraph(data):
         color = np.empty((len(data["x"]), 4))
         for i in range(len(x)):
             pos[i] = (x[i], y[i], z[i])
-            size[i] = s[i] / 1000
+            size[i] = s[i] / 2000
             if v[i]>= 0:
                 color[i] = (0.0, v[i], 0.0, 1.0) #color (r,g,b,a)
             else:
                 color[i] = (-v[i], 0.0, 0.0, 1.0) #color (r,g,b,a)
 
         sp1 = gl.GLScatterPlotItem(pos=pos, size=size, color=color, pxMode=False)
-        sp1.translate(0, 0, 0)
+        #sp1.translate(0, 0, 0)
 
         if plotDetectedPointsGraph.sp[plotDetectedPointsGraph.spIndex] != None:
             sp2 = plotDetectedPointsGraph.sp[plotDetectedPointsGraph.spIndex]
