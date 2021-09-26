@@ -14,8 +14,7 @@ except ImportError as e:
 # Change the configuration file name
 #configFileName = 'AWR1843config.cfg'
 #configFileName = 'ss.cfg'
-#configFileName = 'profile_3d.cfg'
-configFileName = 'profile_3d.1.cfg'
+configFileName = 'profile_3d.cfg'
 
 BYTE_VEC_ACC_MAX_SIZE = 2**15
 
