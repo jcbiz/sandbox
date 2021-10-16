@@ -1,5 +1,6 @@
 import os
 import sys
+import signal
 try:
     import serial
     import time
@@ -661,6 +662,14 @@ def startQt():
             QtGui.QApplication.instance().exec_()
 
 
+def signalHandler(signal, frame):
+    print(f'got signal {signal}')
+    CLIport.write(('sensorStop\n').encode())
+    time.sleep(1)
+
+    if qt != None:
+        qt.exit()
+
 # -------------------------    MAIN   -----------------------------------------  
 if __name__ == '__main__':
     # Configurate the serial port
@@ -668,6 +677,9 @@ if __name__ == '__main__':
 
     # Get the configuration parameters from the configuration file
     configParameters = parseConfigFile(configFileName)
+
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    signal.signal(signal.SIGINT, signalHandler)
 
     # Main loop 
     try:
