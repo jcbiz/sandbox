@@ -11,9 +11,10 @@ ENV PATH="/sbin:/usr/sbin:${PATH}"
 RUN apt update && \
     apt install -y --no-install-recommends \
       openssh-server \
-      sudo iproute2 iputils-ping traceroute net-tools vim && \
+      sudo iproute2 iputils-ping traceroute net-tools vim ncat tcpdump psmisc && \
     apt install /tmp/docker-ce-cli_27.3.1-1_bookworm_amd64.deb && \
     apt install /tmp/docker-compose-plugin_2.29.7-1_bookworm_amd64.deb && \
+    apt autoremove -y && \
     apt clean && \
     rm -f /tmp/*.deb
 
