@@ -1,0 +1,18 @@
+services:
+  DiagShell:
+    image: jcb/dockershell:201
+    container_name: dockershell
+    hostname: dockershell
+    privileged: false
+    restart: unless-stopped
+    mem_limit: 100m
+#    cpus: 0.1
+    env_file:
+      - "dockershell.env"
+    volumes:
+      - "dockershell:/home/docker"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/lib/docker:/var/lib/docker"
+    network_mode: bridge
+    ports:
+      - "22022:22/tcp"

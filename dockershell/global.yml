@@ -1,0 +1,4 @@
+volumes:
+  dockershell:
+    external: true
+    name: dockershell
